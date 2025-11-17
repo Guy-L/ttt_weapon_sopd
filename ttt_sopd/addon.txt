@@ -1,0 +1,7 @@
+"AddonInfo"
+{
+    "name"        "[TTT2] Sword of Player Defeat"
+    "version"     "1.0"
+    "author"      "Guy"
+    "description" "What a triumph is that."
+}

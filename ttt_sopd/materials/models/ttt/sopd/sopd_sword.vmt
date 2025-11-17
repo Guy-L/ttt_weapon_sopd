@@ -1,0 +1,8 @@
+VertexLitGeneric
+{
+    "$basetexture" "models/ttt/sopd/sopd_sword"
+    "$model" "1"
+    "$phong" "1"
+    "$phongboost" "1"
+    "$phongexponent" "20"
+}
