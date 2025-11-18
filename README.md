@@ -5,7 +5,7 @@ See [the addon's workshop page](https://steamcommunity.com/sharedfiles/filedetai
 * Special behavior if player is holding their own defeat sword (can kill anyone with it?)
 * Putting the target's profile pic. on the model or behind the shop icon (if possible)
 * Make deploy song loop instead of fading out
-* Cosmetic improvements to the PaP effect & making it play the alternative deploy song
+* Cosmetic improvements to the PaP effect, making the upgrade message reflect the PAP damage resist convar & making it play the alternative deploy song
 * Bug: Deploy song randomly stopping early
 * Bug: Deploy song not stopping in some cases when PaP'ing.
 * Bug: Randomly swapping models with the crowbar when deploying/holstering
