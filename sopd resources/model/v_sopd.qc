@@ -51,7 +51,7 @@ $bonemerge "ValveBiped.HandControlRotR"
 
 
 $sequence "idle01" {
-	"v_sopd_anims\idle01.smd"
+	"v_sopd_anims\sopd_idle01.smd"
 	activity "ACT_VM_IDLE" 1
 	fadein 0.2
 	fadeout 0.2
@@ -60,7 +60,7 @@ $sequence "idle01" {
 }
 
 $sequence "draw" {
-	"v_sopd_anims\draw.smd"
+	"v_sopd_anims\sopd_draw.smd"
 	activity "ACT_VM_DRAW" 1
 	fadein 0.2
 	fadeout 0.2
@@ -68,7 +68,7 @@ $sequence "draw" {
 }
 
 $sequence "misscenter1" {
-	"v_sopd_anims\misscenter1.smd"
+	"v_sopd_anims\sopd_misscenter1.smd"
 	activity "ACT_VM_MISSCENTER" 1
 	fadein 0.2
 	fadeout 0.2
@@ -76,7 +76,7 @@ $sequence "misscenter1" {
 }
 
 $sequence "misscenter2" {
-	"v_sopd_anims\misscenter2.smd"
+	"v_sopd_anims\sopd_misscenter2.smd"
 	activity "ACT_VM_MISSCENTER" 1
 	fadein 0.2
 	fadeout 0.2
@@ -84,7 +84,7 @@ $sequence "misscenter2" {
 }
 
 $sequence "hitcenter1" {
-	"v_sopd_anims\hitcenter1.smd"
+	"v_sopd_anims\sopd_hitcenter1.smd"
 	activity "ACT_VM_HITCENTER" 1
 	fadein 0.2
 	fadeout 0.2
@@ -92,7 +92,7 @@ $sequence "hitcenter1" {
 }
 
 $sequence "hitcenter2" {
-	"v_sopd_anims\hitcenter2.smd"
+	"v_sopd_anims\sopd_hitcenter2.smd"
 	activity "ACT_VM_HITCENTER" 1
 	fadein 0.2
 	fadeout 0.2
@@ -100,7 +100,7 @@ $sequence "hitcenter2" {
 }
 
 $sequence "hitcenter3" {
-	"v_sopd_anims\hitcenter3.smd"
+	"v_sopd_anims\sopd_hitcenter3.smd"
 	activity "ACT_VM_HITCENTER" 1
 	fadein 0.2
 	fadeout 0.2
@@ -108,7 +108,7 @@ $sequence "hitcenter3" {
 }
 
 $sequence "hitkill1" {
-	"v_sopd_anims\hitkill1.smd"
+	"v_sopd_anims\sopd_hitkill1.smd"
 	activity "ACT_VM_HITKILL" 1
 	fadein 0.2
 	fadeout 0.2
@@ -116,7 +116,7 @@ $sequence "hitkill1" {
 }
 
 $sequence "holster" {
-	"v_sopd_anims\holster.smd"
+	"v_sopd_anims\sopd_holster.smd"
 	activity "ACT_VM_HOLSTER" 1
 	fadein 0.2
 	fadeout 0.2

@@ -23,7 +23,7 @@ $definebone "ValveBiped.Bip01_R_Hand" "" -0.631371 -6.659214 -3.65312 -74.60186 
 
 
 $sequence "idle" {
-	"w_sopd_anims\idle.smd"
+	"w_sopd_anims\sopd_idle.smd"
 	activity "ACT_VM_IDLE" 1
 	fadein 0.2
 	fadeout 0.2
@@ -32,7 +32,7 @@ $sequence "idle" {
 }
 
 $sequence "attack1" {
-	"w_sopd_anims\attack1.smd"
+	"w_sopd_anims\sopd_attack1.smd"
 	fadein 0.2
 	fadeout 0.2
 	fps 30

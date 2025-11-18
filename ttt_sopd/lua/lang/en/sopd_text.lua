@@ -27,13 +27,12 @@ L["label_sopd_sfx_deploy_soundlevel"] = "Sword deploy song audible range (dB)"
 L["label_sopd_sfx_volume_desc"] = "Base volume for both sound effect types before any stealth-related reductions."
 L["label_sopd_sfx_deploy_volume"] = "Base sword deploy song volume (%)"
 L["label_sopd_sfx_kill_volume"] = "Base sword kill sound volume (%)"
-L["label_sopd_sfx_oatmeal_for_last"] = "Sword plays \"1, 2, Oatmeal\" for last opponent when deployed"
+L["label_sopd_sfx_oatmeal_for_last"] = "Sword plays \"1, 2, Oatmeal\" when deployed with only one opponent left"
 L["label_sopd_sfx_stealth_desc"] = [[
 Stealth: If there are n or more opponents (inno/side team members) left alive, the sword's sound effect volumes are reduced by v. For less than n opponents, this effect gets proportionally weaker, going away completely at 1 opponent left. 
   - If v = 0, no reduction occurs. 
   - If v = 1, the sword is silent at n or more opponents alive.
-  - Formula: adjVol = vol * (1 - v * min(1, (oppCnt - 1) / (n - 1)))
-]]
+  - Formula: adjVol = vol * (1 - v * min(1, (oppCnt - 1) / (n - 1)))]]
 L["label_sopd_sfx_stealth_vol_reduction"] = "[Stealth] v = Max volume reduction (%)"
 L["label_sopd_sfx_stealth_max_opps"] = "[Stealth] n = Max reduction minimum opponent count"
 

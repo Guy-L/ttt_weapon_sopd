@@ -309,7 +309,7 @@ elseif CLIENT then
     SWEP.Slot = 6
 
     SWEP.ViewModelFlip = false
-    SWEP.ViewModelFOV  = 85
+    SWEP.ViewModelFOV  = 80
     SWEP.DrawCrosshair = false
 
     local dmgReductionDesc = ""
