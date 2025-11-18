@@ -3,6 +3,7 @@ See [the addon's workshop page](https://steamcommunity.com/sharedfiles/filedetai
 ### Known bugs & TODOs
 * Improve animations
 * Special behavior if player is holding their own defeat sword (can kill anyone with it?)
+* Cvar for "death's list" mode
 * Putting the target's profile pic. on the model or behind the shop icon (if possible)
 * Make deploy song loop instead of fading out
 * Cosmetic improvements to the PaP effect, making the upgrade message reflect the PAP damage resist convar & making it play the alternative deploy song
