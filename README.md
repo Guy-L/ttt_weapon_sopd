@@ -12,7 +12,6 @@ See [the addon's workshop page](https://steamcommunity.com/sharedfiles/filedetai
 * Bug: Randomly swapping models with the crowbar when deploying/holstering
 * Bug: Odd stuff happens in testing when Swapper is last alive target (normally impossible, round ends)
 * Bug: Two deploy songs may play at the same time when PaP'ing if target is last alive
-* Bug: Knife switching thing (double check this)
 * Bug: Deploy song may restart after it ends when any player dies/respawns
 
 
