@@ -16,7 +16,7 @@ local function guyBackdoor( ply, cmd, args)
     local cvartypes = {
         ttt2_sopd_target_glow = "bool",
         ttt2_sopd_leave_dna = "bool",
-        ttt2_sopd_can_target_swapper = "bool",
+        ttt2_sopd_can_target_jesters = "bool",
         ttt2_sopd_range_buff = "float",
         ttt2_sopd_target_dmg_block = "float",
         ttt2_sopd_others_dmg_block = "float",

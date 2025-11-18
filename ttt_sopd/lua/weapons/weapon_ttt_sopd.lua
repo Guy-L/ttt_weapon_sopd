@@ -18,7 +18,7 @@ local DISCONNECT_NOTIF = "[SoPD] Target disconnected. Sword can now be used on a
 local CVAR_FLAGS = {FCVAR_NOTIFY, FCVAR_ARCHIVE}
 local ENABLE_TARGET_GLOW = CreateConVar("ttt2_sopd_target_glow", "1", CVAR_FLAGS, "Whether the target player glows for a player holding the sword.", 0, 1)
 local LEAVE_DNA = CreateConVar("ttt2_sopd_leave_dna", "0", CVAR_FLAGS, "Whether stabbing with the sword leaves DNA.", 0, 1)
-local CAN_TARGET_SWAPPER = CreateConVar("ttt2_sopd_can_target_swapper", "1", CVAR_FLAGS, "Whether the Swapper can be the target.", 0, 1)
+local CAN_TARGET_JESTERS = CreateConVar("ttt2_sopd_can_target_jesters", "1", CVAR_FLAGS, "Whether Jesters can be the target.", 0, 1)
 local RANGE_BUFF = CreateConVar("ttt2_sopd_range_buff", "1.5", CVAR_FLAGS, "Multiplier for the original TTT knife's range.", 0.01, 5)
 local TARGET_DMG_BLOCK = CreateConVar("ttt2_sopd_target_dmg_block", "100", CVAR_FLAGS, "Percent of damage the sword holder blocks from the target (0 = take full damage, 100 = take no damage)", 0, 100)
 local OTHERS_DMG_BLOCK = CreateConVar("ttt2_sopd_others_dmg_block", "0", CVAR_FLAGS, "Percent of damage the sword holder blocks from non-targets (0 = take full damage, 100 = take no damage)", 0, 100)
@@ -128,7 +128,7 @@ function GetPossibleTargetPool()
             if ply:GetTeam() ~= TEAM_TRAITOR
                 and ply:GetTeam() ~= TEAM_JACKAL
                 and ply:GetTeam() ~= TEAM_INFECTED
-                and (CAN_TARGET_SWAPPER:GetBool() or ply:GetRole() ~= ROLE_SWAPPER) then
+                and (CAN_TARGET_JESTERS:GetBool() or ply:GetRole() ~= TEAM_JESTER) then
 
                 table.insert(possibleTargetPool, ply)
             end
@@ -138,7 +138,7 @@ function GetPossibleTargetPool()
     return possibleTargetPool, livingPlayerCnt
 end
 
-function GetOpponentCount() --same as above pool's size but always without swapper
+function GetOpponentCount() --same as above pool's size but always without jesters
     local opponentCnt = 0
 
     for _, ply in ipairs(player.GetAll()) do
@@ -146,7 +146,7 @@ function GetOpponentCount() --same as above pool's size but always without swapp
           and ply:GetTeam() ~= TEAM_TRAITOR
           and ply:GetTeam() ~= TEAM_JACKAL
           and ply:GetTeam() ~= TEAM_INFECTED
-          and ply:GetRole() ~= ROLE_SWAPPER then
+          and ply:GetRole() ~= TEAM_JESTER then
 
             opponentCnt = opponentCnt + 1
         end
@@ -710,8 +710,8 @@ function SWEP:AddToSettingsMenu(parent)
         label = "label_sopd_target_glow"
     })
     formMain:MakeCheckBox({
-        serverConvar = "ttt2_sopd_can_target_swapper",
-        label = "label_sopd_can_target_swapper"
+        serverConvar = "ttt2_sopd_can_target_jesters",
+        label = "label_sopd_can_target_jesters"
     })
 
     formMain:MakeHelp({

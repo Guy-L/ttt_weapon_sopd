@@ -14,7 +14,7 @@ L["label_sopd_others_dmg_block"] = "Damage resist. from other players while hold
 L["label_sopd_speedup"] = "Speed multiplier while holding sword"
 L["label_sopd_leave_dna"] = "Sword leaves DNA"
 L["label_sopd_target_glow"] = "Target glows through walls while holding sword"
-L["label_sopd_can_target_swapper"] = "Swapper can be the target"
+L["label_sopd_can_target_jesters"] = "Jesters can be the target"
 
 L["label_sopd_pap_form"] = "Pack a Punch"
 L["label_sopd_pap_heal"] = "Heal from inhaling enemy"
