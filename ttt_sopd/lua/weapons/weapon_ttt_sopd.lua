@@ -85,13 +85,13 @@ local function StartDeploySound(wep)
     local owner = wep:GetOwner()
 
     if wep.DeploySound and wep.DeploySound:IsPlaying() then
-        if DEBUG:GetBool() then print("Not starting deploy sound (song already playing).") end
+        if DEBUG:GetBool() then print("[SFX] Not starting deploy sound (song already playing).") end
         return
     end
 
     if IsValid(owner) and wep:CanStab()
       and (IsLivingPlayer(swordTargetPlayer) or not swordTargetPlayer) then
-        if DEBUG:GetBool() then print("Starting deploy sound.") end
+        if DEBUG:GetBool() then print("[SFX] Starting deploy sound.") end
 
         local deploySnd = "gourmet"
         if GetOpponentCount() == 1 and OATMEAL_FOR_LAST:GetBool() then
@@ -108,11 +108,11 @@ local function StopDeploySound(wep)
     if not SERVER then return end
 
     if wep.DeploySound and not wep.DeploySound:IsPlaying() then
-        if DEBUG:GetBool() then print("Not stopping deploy sound (song not playing).") end
+        if DEBUG:GetBool() then print("[SFX] Not stopping deploy sound (song not playing).") end
         return
     end
 
-    if DEBUG:GetBool() then print("Stopping deploy sound.") end
+    if DEBUG:GetBool() then print("[SFX] Stopping deploy sound.") end
     if wep.DeploySound then
         wep.DeploySound:Stop()
         wep.DeploySound = nil
@@ -166,12 +166,12 @@ function AdjustVolume(base_vol) -- stealth volume reduction effect adjustment
     local finalVolume = (1 - reductionStrength * maxReduction) * base_vol
 
     if DEBUG:GetBool() then
-        print("base volume", base_vol)
-        print("max reduction", maxReduction)
-        print("max opps", maxOpps)
-        print("opp count", GetOpponentCount())
-        print("-> reduction strength", reductionStrength)
-        print("-> adjusted volume", math.max(finalVolume, 0))
+        print("[SFX] base volume", base_vol)
+        print("[SFX] max reduction", maxReduction)
+        print("[SFX] max opps", maxOpps)
+        print("[SFX] opp count", GetOpponentCount())
+        print("[SFX] -> reduction strength", reductionStrength)
+        print("[SFX] -> adjusted volume", math.max(finalVolume, 0))
     end
 
     return math.max(finalVolume, 0)
@@ -253,11 +253,11 @@ if SERVER then
             local wep = p:GetActiveWeapon()
             if IsValid(wep) and wep:GetClass() == CLASS_NAME then
                 if swordTargetPlayer and ply == swordTargetPlayer then
-                    if DEBUG:GetBool() then print("Stopping sword deploy sound due to target death | Target: ", swordTargetPlayer:Nick()) end
+                    if DEBUG:GetBool() then print("[SFX] Stopping sword deploy sound due to target death | Target: ", swordTargetPlayer:Nick()) end
                     StopDeploySound(wep)
 
                 elseif wep.DeploySound and wep.DeploySound:IsPlaying() then
-                    if DEBUG:GetBool() then print("Actualizing sword deploy volume due to nontarget death | Died: ", ply:Nick()) end
+                    if DEBUG:GetBool() then print("[SFX] Actualizing sword deploy volume due to nontarget death | Died: ", ply:Nick()) end
                     wep.DeploySound:ChangeVolume(AdjustVolume(DEPLOY_SND_VOLUME:GetFloat()/100))
                 end
             end
@@ -276,11 +276,11 @@ if SERVER then
             local wep = p:GetActiveWeapon()
             if IsValid(wep) and wep:GetClass() == CLASS_NAME then
                 if IsLivingPlayer(swordTargetPlayer) and ply == swordTargetPlayer then
-                    if DEBUG:GetBool() then print("Starting sword deploy sound due to target respawn | Target: ", swordTargetPlayer:Nick()) end
+                    if DEBUG:GetBool() then print("[SFX] Starting sword deploy sound due to target respawn | Target: ", swordTargetPlayer:Nick()) end
                     StartDeploySound(wep)
 
                 elseif wep.DeploySound and wep.DeploySound:IsPlaying() then
-                    if DEBUG:GetBool() then print("Actualizing sword deploy volume due to nontarget respawn | Respawned: ", ply:Nick()) end
+                    if DEBUG:GetBool() then print("[SFX] Actualizing sword deploy volume due to nontarget respawn | Respawned: ", ply:Nick()) end
                     wep.DeploySound:ChangeVolume(AdjustVolume(DEPLOY_SND_VOLUME:GetFloat()/100))
                 end
             end
@@ -434,7 +434,7 @@ elseif CLIENT then
                 choice = "triumph_other"
             end
 
-            if DEBUG:GetBool() then print("Playing on-kill triumph sound", choice) end
+            if DEBUG:GetBool() then print("[SFX] Playing on-kill triumph sound", choice) end
             swordEnt:EmitSound(sounds[choice], SNDLVL_150dB, 100, AdjustVolume(KILL_SND_VOLUME:GetFloat()/100), CHAN_BODY)
         end
     end)
@@ -444,7 +444,8 @@ elseif CLIENT then
         self:AddTTT2HUDHelp("sopd_instruction")
 
         -- chat notification if you buy sword after the target disconnects
-        if GetOpponentCount() > 0 and not swordTargetPlayer then
+        if GetOpponentCount() > 0 and not swordTargetPlayer
+          and LocalPlayer():GetRole() != ROLE_DEATHMATCHER then
             LocalPlayer():ChatPrint(DISCONNECT_NOTIF)
         end
 
@@ -520,7 +521,11 @@ function SWEP:PrimaryAttack()
     if SERVER then
         owner:SetAnimation(PLAYER_ATTACK1)
 
+        if DEBUG:GetBool() then print("SoPD Primary Attack Check 1:", self:CanStab(), tr.Hit, tr.HitNonWorld, IsValid(hitEnt)) end
+
         if self:CanStab() and tr.Hit and tr.HitNonWorld and IsValid(hitEnt) then
+            if DEBUG:GetBool() then print("SoPD Primary Attack Check 2:", CanBeSlain(hitEnt), hitEnt:GetClass() == "prop_ragdoll", hitEnt:IsPlayerRagdoll(), CanBeSlain(hitEnt.PlyOwner), swordTargetPlayer or self.Packed, "from", swordTargetPlayer and 1 or 0, self.Packed) end
+
             if CanBeSlain(hitEnt) then
                 self:StabKill(tr, spos, sdest)
             elseif hitEnt:GetClass() == "prop_ragdoll" and hitEnt:IsPlayerRagdoll() and CanBeSlain(hitEnt.PlyOwner) and (swordTargetPlayer or self.Packed) then
@@ -649,7 +654,7 @@ function SWEP:StabRagdoll(tr, spos, sdest)
 end
 
 function SWEP:Consume(doPap, rag)
-    if DEBUG:GetBool() then print("Stopping deploy sound due to consumption") end
+    if DEBUG:GetBool() then print("[SFX] Stopping deploy sound due to consumption") end
     StopDeploySound(self)
 
     if swordTargetPlayer then
@@ -677,7 +682,7 @@ function SWEP:Equip()
 end
 
 function SWEP:PreDrop()
-    if DEBUG:GetBool() then print("Stopping deploy sound due to item drop") end
+    if DEBUG:GetBool() then print("[SFX] Stopping deploy sound due to item drop") end
     StopDeploySound(self)
     self.fingerprints = {}
 end
@@ -836,13 +841,13 @@ end
 function SWEP:Deploy()
     self.Weapon:SendWeaponAnim(ACT_VM_DRAW)
 
-    if DEBUG:GetBool() then print("Starting deploy sound due to deploy") end
+    if DEBUG:GetBool() then print("[SFX] Starting deploy sound due to deploy") end
     StartDeploySound(self)
     return true
 end
 
 function SWEP:Holster()
-    if DEBUG:GetBool() then print("Stopping deploy sound due to holster") end
+    if DEBUG:GetBool() then print("[SFX] Stopping deploy sound due to holster") end
     StopDeploySound(self)
     return true
 end
