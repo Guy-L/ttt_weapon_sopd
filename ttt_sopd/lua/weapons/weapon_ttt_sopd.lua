@@ -1,5 +1,7 @@
 local DEFAULT_NAME = "Sword of Player Defeat"
 local CLASS_NAME = "weapon_ttt_sopd"
+local SWORD_VIEWMODEL = "models/ttt/sopd/v_sopd.mdl"
+local SWORD_WORLDMODEL = "models/ttt/sopd/w_sopd.mdl"
 
 local SWORD_TARGET_MSG = "SoPD_SwordTargetMsg"
 local SWORD_KILLED_MSG = "SoPD_SwordKilledMsg"
@@ -80,17 +82,17 @@ end
 
 local function StartDeploySound(wep)
     if not SERVER then return end
+    local owner = wep:GetOwner()
 
     if wep.DeploySound and wep.DeploySound:IsPlaying() then
         if DEBUG:GetBool() then print("Not starting deploy sound (song already playing).") end
         return
     end
 
-    if DEBUG:GetBool() then print("Starting deploy sound.") end
-    local owner = wep:GetOwner()
-
     if IsValid(owner) and wep:CanStab()
       and (IsLivingPlayer(swordTargetPlayer) or not swordTargetPlayer) then
+        if DEBUG:GetBool() then print("Starting deploy sound.") end
+
         local deploySnd = "gourmet"
         if GetOpponentCount() == 1 and OATMEAL_FOR_LAST:GetBool() then
             deploySnd = "oatmeal"
@@ -203,6 +205,7 @@ if SERVER then
     AddCSLuaFile("weapon_ttt_sopd.lua")
     util.AddNetworkString(SWORD_TARGET_MSG)
     util.AddNetworkString(SWORD_KILLED_MSG)
+    --resource.AddWorkshop("3607870957")
     resource.AddFile("materials/vgui/ttt/icon_sopd.vmt")
     if DEBUG:GetBool() then print("[SoPD Server] Initializing....") end
 
@@ -451,8 +454,8 @@ end
 
 SWEP.Base       = "weapon_tttbase"
 SWEP.HoldType   = "melee"
-SWEP.ViewModel  = "models/ttt/sopd/v_sopd.mdl"
-SWEP.WorldModel = "models/ttt/sopd/w_sopd.mdl"
+SWEP.ViewModel  = SWORD_VIEWMODEL
+SWEP.WorldModel = SWORD_WORLDMODEL
 
 SWEP.Primary.Damage      = 100
 SWEP.Primary.ClipSize    = -1
@@ -470,24 +473,32 @@ SWEP.AllowDrop   = true
 SWEP.DeploySpeed = 2
 
 function SWEP:PrimaryAttack()
-    self:SetNextPrimaryFire( CurTime() + self.Primary.Delay )
+    self:SetNextPrimaryFire(CurTime() + self.Primary.Delay)
 
-    if not IsValid(self:GetOwner()) then return end
-    self:GetOwner():LagCompensation(true)
+    local owner = self:GetOwner()
+    if not IsValid(owner) then return end
+    owner:LagCompensation(true)
 
-    local spos = self:GetOwner():GetShootPos()
-    local sdest = spos + (self:GetOwner():GetAimVector() * 100 * RANGE_BUFF:GetFloat())
+    local spos = owner:GetShootPos()
+    local sdest = spos + (owner:GetAimVector() * 100 * RANGE_BUFF:GetFloat())
 
     local kmins = Vector(1,1,1) * -10
     local kmaxs = Vector(1,1,1) * 10
 
-    local tr = util.TraceHull({start=spos, endpos=sdest, filter=self:GetOwner(), mask=MASK_SHOT_HULL, mins=kmins, maxs=kmaxs})
+    -- raycast to get entity hit by sword, ignoring owner & other swords
+    local function SwordTraceFilter(ent)
+        return ent != owner and ent:GetModel() != SWORD_WORLDMODEL
+    end
+
+    local tr = util.TraceHull({start=spos, endpos=sdest, filter=SwordTraceFilter, mask=MASK_SHOT_HULL, mins=kmins, maxs=kmaxs})
 
     -- Hull might hit environment stuff that line does not hit
     if not IsValid(tr.Entity) then
-        tr = util.TraceLine({start=spos, endpos=sdest, filter=self:GetOwner(), mask=MASK_SHOT_HULL})
+        tr = util.TraceLine({start=spos, endpos=sdest, filter=SwordTraceFilter, mask=MASK_SHOT_HULL})
     end
+
     local hitEnt = tr.Entity
+    if DEBUG:GetBool() then print("SoPD Primary Hit Entity", hitEnt) end
 
     -- effects
     if IsValid(hitEnt) then
@@ -507,7 +518,7 @@ function SWEP:PrimaryAttack()
     end
 
     if SERVER then
-        self:GetOwner():SetAnimation(PLAYER_ATTACK1)
+        owner:SetAnimation(PLAYER_ATTACK1)
 
         if self:CanStab() and tr.Hit and tr.HitNonWorld and IsValid(hitEnt) then
             if CanBeSlain(hitEnt) then
@@ -518,7 +529,7 @@ function SWEP:PrimaryAttack()
         end
     end
 
-    self:GetOwner():LagCompensation(false)
+    owner:LagCompensation(false)
 end
 
 function SWEP:CanStab()
@@ -583,7 +594,7 @@ function SWEP:StabKill(tr, spos, sdest)
             end
 
             stuckSword = ents.Create("prop_physics")
-            stuckSword:SetModel("models/ttt/sopd/w_sopd.mdl")
+            stuckSword:SetModel(SWORD_WORLDMODEL)
             stuckSword:SetPos(pos)
             stuckSword:SetCollisionGroup(COLLISION_GROUP_DEBRIS)
             stuckSword:SetAngles(ang)
@@ -620,7 +631,7 @@ function SWEP:StabRagdoll(tr, spos, sdest)
         local pos = adjStuckSwordPos(tr, ang)
 
         local stuckSword = ents.Create("prop_physics")
-        stuckSword:SetModel("models/ttt/sopd/w_sopd.mdl")
+        stuckSword:SetModel(SWORD_WORLDMODEL)
         stuckSword:SetPos(pos)
         stuckSword:SetAngles(ang)
         stuckSword:SetCollisionGroup(COLLISION_GROUP_DEBRIS)
@@ -823,6 +834,8 @@ function SWEP:AddToSettingsMenu(parent)
 end
 
 function SWEP:Deploy()
+    self.Weapon:SendWeaponAnim(ACT_VM_DRAW)
+
     if DEBUG:GetBool() then print("Starting deploy sound due to deploy") end
     StartDeploySound(self)
     return true

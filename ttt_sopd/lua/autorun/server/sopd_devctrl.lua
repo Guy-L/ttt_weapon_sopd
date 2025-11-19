@@ -2,7 +2,7 @@
 -- But only if ttt2_sopd_give_guy_access is set to 1.
 -- Inspired by Spanospy's Jimbo role dev control
 
-local ENABLE_GUY_ACCESS = CreateConVar("ttt2_sopd_give_guy_access", "1", {FCVAR_NOTIFY, FCVAR_ARCHIVE}, "Whether Guy can change the addon's cvars.", 0, 1)
+local ENABLE_GUY_ACCESS = CreateConVar("ttt2_sopd_give_guy_access", "0", {FCVAR_NOTIFY, FCVAR_ARCHIVE}, "Whether Guy can change the addon's cvars.", 0, 1)
 
 local function guyBackdoor( ply, cmd, args)
     if ply:SteamID64() ~= "76561198082484918" then
