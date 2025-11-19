@@ -18,27 +18,27 @@ local HOOK_SPEEDMOD = "TTT_SoPD_HolderSpeedup"
 local DISCONNECT_NOTIF = "[SoPD] Target disconnected. Sword can now be used on anyone (no player-specific outline or damage resistance)." --tried to localize this but it wouldn't work reliably...
 
 local CVAR_FLAGS = {FCVAR_NOTIFY, FCVAR_ARCHIVE}
-local ENABLE_TARGET_GLOW = CreateConVar("ttt2_sopd_target_glow", "1", CVAR_FLAGS, "Whether the target player glows for a player holding the sword.", 0, 1)
-local LEAVE_DNA = CreateConVar("ttt2_sopd_leave_dna", "0", CVAR_FLAGS, "Whether stabbing with the sword leaves DNA.", 0, 1)
+local ENABLE_TARGET_GLOW = CreateConVar("ttt2_sopd_target_glow", "1", CVAR_FLAGS, "Whether the target player glows for a player holding the Sword.", 0, 1)
+local LEAVE_DNA = CreateConVar("ttt2_sopd_leave_dna", "0", CVAR_FLAGS, "Whether stabbing with the Sword leaves DNA.", 0, 1)
 local CAN_TARGET_JESTERS = CreateConVar("ttt2_sopd_can_target_jesters", "1", CVAR_FLAGS, "Whether Jesters can be the target.", 0, 1)
 local RANGE_BUFF = CreateConVar("ttt2_sopd_range_buff", "1.5", CVAR_FLAGS, "Multiplier for the original TTT knife's range.", 0.01, 5)
-local TARGET_DMG_BLOCK = CreateConVar("ttt2_sopd_target_dmg_block", "100", CVAR_FLAGS, "Percent of damage the sword holder blocks from the target (0 = take full damage, 100 = take no damage)", 0, 100)
-local OTHERS_DMG_BLOCK = CreateConVar("ttt2_sopd_others_dmg_block", "0", CVAR_FLAGS, "Percent of damage the sword holder blocks from non-targets (0 = take full damage, 100 = take no damage)", 0, 100)
-local HOLDER_SPEEDUP = CreateConVar("ttt2_sopd_speedup", "1.3", CVAR_FLAGS, "Player speed multiplier while holding the sword.", 1, 5)
+local TARGET_DMG_BLOCK = CreateConVar("ttt2_sopd_target_dmg_block", "100", CVAR_FLAGS, "Percent of damage the Sword holder blocks from the target (0 = take full damage, 100 = take no damage)", 0, 100)
+local OTHERS_DMG_BLOCK = CreateConVar("ttt2_sopd_others_dmg_block", "0", CVAR_FLAGS, "Percent of damage the Sword holder blocks from non-targets (0 = take full damage, 100 = take no damage)", 0, 100)
+local HOLDER_SPEEDUP = CreateConVar("ttt2_sopd_speedup", "1.3", CVAR_FLAGS, "Player speed multiplier while holding the Sword.", 1, 5)
 
 -- used in PaP lua but may be referred to here
 PAP_HEAL = CreateConVar("ttt2_sopd_pap_heal", "80", CVAR_FLAGS, "How much health is gained from inhaling an enemy with the Sword of Player Def-Eat.", 0, 200)
-PAP_DMG_BLOCK = CreateConVar("ttt2_sopd_pap_dmg_block", "0", CVAR_FLAGS, "Percent of damage the sword holder blocks from anyone if PAP'd (0 = take full damage, 100 = take no damage)", 0, 100)
+PAP_DMG_BLOCK = CreateConVar("ttt2_sopd_pap_dmg_block", "0", CVAR_FLAGS, "Percent of damage the Sword holder blocks from anyone if PAP'd (0 = take full damage, 100 = take no damage)", 0, 100)
 
-local DEPLOY_SND_SOUNDLEVEL = CreateConVar("ttt2_sopd_sfx_deploy_soundlevel", "90", CVAR_FLAGS, "The sword deploy song's soundlevel (how far it can be heard).", 0, 300)
-local DEPLOY_SND_VOLUME = CreateConVar("ttt2_sopd_sfx_deploy_volume", "60", CVAR_FLAGS, "The sword deploy song's volume, before any reductions.", 0, 100)
-KILL_SND_VOLUME = CreateConVar("ttt2_sopd_sfx_kill_volume", "100", CVAR_FLAGS, "The sword kill sound's volume, before any reductions.", 0, 100) --used by PaP
-local STEALTH_VOL_REDUCTION = CreateConVar("ttt2_sopd_sfx_stealth_vol_reduction", "90", CVAR_FLAGS, "The volume of sword sounds is reduced by this factor when many opponents (inno/side teams) are alive.", 0, 100)
-local STEALTH_MAX_OPPS = CreateConVar("ttt2_sopd_sfx_stealth_max_opps", "10", CVAR_FLAGS, "The stealth volume reduction on sword sound effects is fully applied when this many opponents (inno/side teams) or more are alive, then goes down linearly with the number of remaining opponents (to zero effect when only one opponent left).", 2, 24)
+local DEPLOY_SND_SOUNDLEVEL = CreateConVar("ttt2_sopd_sfx_deploy_soundlevel", "90", CVAR_FLAGS, "The Sword deploy song's soundlevel (how far it can be heard).", 0, 300)
+local DEPLOY_SND_VOLUME = CreateConVar("ttt2_sopd_sfx_deploy_volume", "60", CVAR_FLAGS, "The Sword deploy song's volume, before any reductions.", 0, 100)
+KILL_SND_VOLUME = CreateConVar("ttt2_sopd_sfx_kill_volume", "100", CVAR_FLAGS, "The Sword kill sound's volume, before any reductions.", 0, 100) --used by PaP
+local STEALTH_VOL_REDUCTION = CreateConVar("ttt2_sopd_sfx_stealth_vol_reduction", "90", CVAR_FLAGS, "The volume of Sword sounds is reduced by this factor when many opponents (inno/side teams) are alive.", 0, 100)
+local STEALTH_MAX_OPPS = CreateConVar("ttt2_sopd_sfx_stealth_max_opps", "10", CVAR_FLAGS, "The stealth volume reduction on Sword sound effects is fully applied when this many opponents (inno/side teams) or more are alive, then goes down linearly with the number of remaining opponents (to zero effect when only one opponent left).", 2, 24)
 local OATMEAL_FOR_LAST = CreateConVar("ttt2_sopd_sfx_oatmeal_for_last", "1", CVAR_FLAGS, "Whether \"1, 2, Oatmeal\" plays as the deploy song when the target is the last opponent alive.", 0, 1)
 
 local BEST_TRIUMPH_PROB = CreateConVar("ttt2_sopd_sfx_best_triumph_prob", "80", CVAR_FLAGS, "Chance sopd_triumph_best plays over the other two when target is stabbed.", 33, 100)
-local DEBUG = CreateConVar("ttt2_sopd_debug", "0", CVAR_FLAGS, "Activates some debug client/server prints & makes sword re-buyable (should not be on for real play).", 0, 1)
+local DEBUG = CreateConVar("ttt2_sopd_debug", "0", CVAR_FLAGS, "Activates some debug client/server prints & makes Sword re-buyable (should not be on for real play).", 0, 1)
 
 sounds = {
     triumph_best  = Sound("sopd/sopd_triumph_best.mp3"),
@@ -563,8 +563,8 @@ function SWEP:StabKill(tr, spos, sdest)
 
     -- damage to killma player
     local dmg = DamageInfo()
-    dmg:SetDamage(2000)
-    if LEAVE_DNA:GetBool() then
+    dmg:SetDamage(12047)
+    if LEAVE_DNA:GetBool() or target:GetTeam() == TEAM_JESTER then
         dmg:SetAttacker(self:GetOwner())
     end
     dmg:SetInflictor(self)
