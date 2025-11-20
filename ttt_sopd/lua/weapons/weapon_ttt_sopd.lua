@@ -1,4 +1,4 @@
-CLASS_NAME = "weapon_ttt_sopd"
+local CLASS_NAME = "weapon_ttt_sopd"
 local DEFAULT_NAME = "Sword of Player Defeat"
 local SWORD_VIEWMODEL = "models/ttt/sopd/v_sopd.mdl"
 local SWORD_WORLDMODEL = "models/ttt/sopd/w_sopd.mdl"
@@ -7,7 +7,6 @@ local SWORD_TARGET_MSG   = "SoPD_SwordTargetMsg"
 local SWORD_KILLED_MSG   = "SoPD_SwordKilledMsg"
 local TARGET_DIED_MSG    = "SoPD_TargetDiedMsg"
 local TARGET_SPAWNED_MSG = "SoPD_TargetSpawnedMsg"
-GAINED_DISGUISE_MSG      = "SoPD_GainedDisguiseMsg" --used by PaP
 
 local HOOK_BEGIN_ROUND = "TTT_SoPD_ChooseTarget"
 local HOOK_PRE_GLOW = "TTT_SoPD_TargetGlow"
@@ -223,7 +222,7 @@ if SERVER then
     util.AddNetworkString(SWORD_KILLED_MSG)
     util.AddNetworkString(TARGET_DIED_MSG)
     util.AddNetworkString(TARGET_SPAWNED_MSG)
-    util.AddNetworkString(GAINED_DISGUISE_MSG)
+    util.AddNetworkString("SoPD_GainedDisguiseMsg")
     --resource.AddWorkshop("3607870957")
     resource.AddFile("materials/vgui/ttt/icon_sopd.vmt")
     if DEBUG:GetBool() then print("[SoPD Server] Initializing....") end

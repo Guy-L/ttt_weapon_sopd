@@ -1,6 +1,6 @@
 local UPGRADE = {}
 UPGRADE.id    = "sword_of_player_def_eat"
-UPGRADE.class = CLASS_NAME
+UPGRADE.class = "weapon_ttt_sopd"
 UPGRADE.desc  = "Inhale your enemy and make it later! (cannibalism + identity disguise on stab, even if the target is already dead)" -- no way to localize this?
 --Note: ID disguise functionality requires Identity Disguiser addon to work
 
@@ -52,7 +52,7 @@ function UPGRADE:Apply(SWEP)
 end
 
 if CLIENT then
-    net.Receive(GAINED_DISGUISE_MSG, function(msgLen, ply)
+    net.Receive("SoPD_GainedDisguiseMsg", function(msgLen, ply)
         for _, wep in ipairs(LocalPlayer():GetWeapons()) do
             if wep:GetClass() == CLASS_NAME then
                 wep:AddTTT2HUDHelp("sopd_instruction_pap_lmb2", "sopd_instruction_pap_rmb")
