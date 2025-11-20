@@ -13,7 +13,7 @@ See [the addon's workshop page](https://steamcommunity.com/sharedfiles/filedetai
 * Bug: Two deploy songs may play at the same time when PaP'ing if target is last alive
 * Minor Bug: Odd stuff happens in local testing when Swapper is last alive target (normally impossible, round ends)
 * Minor Bug: Deploy song may restart after it ends when any player dies/respawns
-* Bug [wontfix]: PaP'ing sword after the target disconnects sends user the related chat notifcation agai
+* Minor Bug [wontfix]: PaP'ing sword after the target disconnects sends user the related chat notifcation again
 
 
 
