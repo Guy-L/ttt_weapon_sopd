@@ -12,7 +12,7 @@ function UPGRADE:Apply(SWEP)
 
     SWEP.Packed = true
     if CLIENT then
-        SWEP:AddTTT2HUDHelp("sopd_instruction", "sopd_instruction_pap")
+        SWEP:AddTTT2HUDHelp("sopd_instruction_pap_lmb")
     end
 
     function SWEP:PackEffect(rag, owner)
@@ -35,6 +35,8 @@ function UPGRADE:Apply(SWEP)
                 owner:UpdateStoredDisguiserTarget(victim, victim:GetModel(), victim:GetSkin())
                 owner:ActivateDisguiserTarget()
                 self.CopiedIdentity = victim
+                net.Start(GAINED_DISGUISE_MSG)
+                net.Send(owner)
             end
         end)
     end
@@ -47,6 +49,16 @@ function UPGRADE:Apply(SWEP)
             owner:ToggleDisguiserTarget()
         end
     end
+end
+
+if CLIENT then
+    net.Receive(GAINED_DISGUISE_MSG, function(msgLen, ply)
+        for _, wep in ipairs(LocalPlayer():GetWeapons()) do
+            if wep:GetClass() == CLASS_NAME then
+                wep:AddTTT2HUDHelp("sopd_instruction_pap_lmb2", "sopd_instruction_pap_rmb")
+            end
+        end
+    end)
 end
 
 TTTPAP:Register(UPGRADE)

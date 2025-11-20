@@ -1,9 +1,14 @@
 local L = LANG.GetLanguageTableReference("en")
 
-L["sopd_instruction"] = "Defeat"
-L["sopd_instruction_pap"] = "Toggle copy ability (disguise)"
+L["sopd_instruction_targeted"] = "Defeat target"
+L["sopd_instruction_targetless"] = "Defeat any player"
+L["sopd_instruction_stab"] = "Stab corpse"
+L["sopd_instruction_stab_coverup"] = "Stab corpse & destroy evidence"
+L["sopd_instruction_pap_lmb"] = "Inhale enemy"
+L["sopd_instruction_pap_lmb2"] = "Swing triumphantly"
+L["sopd_instruction_pap_rmb"] = "Toggle copy ability (disguise)"
 L["sopd_instantkill"] = "DEFEAT"
-
+L["sopd_instanteat"] = "INHALE"
 
 L["label_sopd_main_form"] = "General Gameplay"
 L["label_sopd_range_buff_desc"] = "Multiplier of the base TTT2 knife's range (1 = same range as knife)."
@@ -18,7 +23,7 @@ L["label_sopd_target_glow"] = "Target glows through walls while holding Sword"
 L["label_sopd_can_target_jesters"] = "Jesters can be selected as the target"
 
 L["label_sopd_pap_form"] = "Pack a Punch"
-L["label_sopd_pap_heal"] = "Heal from inhaling enemy"
+L["label_sopd_pap_heal"] = "Heal from inhaling an enemy"
 L["label_sopd_pap_dmg_block_desc"] = "Similar to (and adds to) the two damage resist. options in General Gameplay, but from any player and only if PaP'd."
 L["label_sopd_pap_dmg_block"] = "Damage resist. from players while holding Sword (%)"
 

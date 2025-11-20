@@ -3,8 +3,12 @@ local DEFAULT_NAME = "Sword of Player Defeat"
 local SWORD_VIEWMODEL = "models/ttt/sopd/v_sopd.mdl"
 local SWORD_WORLDMODEL = "models/ttt/sopd/w_sopd.mdl"
 
-local SWORD_TARGET_MSG = "SoPD_SwordTargetMsg"
-local SWORD_KILLED_MSG = "SoPD_SwordKilledMsg"
+local SWORD_TARGET_MSG   = "SoPD_SwordTargetMsg"
+local SWORD_KILLED_MSG   = "SoPD_SwordKilledMsg"
+local TARGET_DIED_MSG    = "SoPD_TargetDiedMsg"
+local TARGET_SPAWNED_MSG = "SoPD_TargetSpawnedMsg"
+GAINED_DISGUISE_MSG      = "SoPD_GainedDisguiseMsg" --used by PaP
+
 local HOOK_BEGIN_ROUND = "TTT_SoPD_ChooseTarget"
 local HOOK_PRE_GLOW = "TTT_SoPD_TargetGlow"
 local HOOK_RENDER_ENTINFO = "TTT_SoPD_TargetKillInfo"
@@ -54,6 +58,7 @@ sounds = {
 
 --sword target, synchronized for server & client
 swordTargetPlayer = nil
+roundTargetPoolSize = nil --needed to check if targetless due to low playercount
 
 function CanBeSlain(ply)
     --print("CanBeSlain", IsValid(ply))
@@ -180,34 +185,45 @@ function AdjustVolume(base_vol) -- stealth volume reduction effect adjustment
     return math.max(finalVolume, 0)
 end
 
-function UnTargetSwords() -- if target disconnects
-    local swords = {}
+function GetAllInvSwords()
+    local invSwords = {}
 
     for _, ent in ipairs(ents.GetAll()) do
         if IsValid(ent) and ent:GetClass() == CLASS_NAME then
-            ent.PrintName = DEFAULT_NAME
+            table.insert(invSwords, ent)
+        end
+    end
 
-            if ent.Packed then
-                ent.Primary.ClipSize = 1
-                ent:SetClip1(not ent.StabbedTarget and 1 or 0)
-            end
+    return invSwords
+end
 
-            if CLIENT then
-                local owner = ent:GetOwner()
-                if IsLivingPlayer(owner) then
-                    owner:ChatPrint(DISCONNECT_NOTIF)
-                end
+function UnTargetSwords() -- if target disconnects
+    for _, sword in ipairs(GetAllInvSwords()) do
+        sword.PrintName = DEFAULT_NAME
+
+        if sword.Packed then
+            sword.Primary.ClipSize = 1
+            sword:SetClip1(not sword.StabbedTarget and 1 or 0)
+        end
+
+        if CLIENT then
+            sword:UpdateTooltip(false)
+
+            local owner = sword:GetOwner()
+            if IsLivingPlayer(owner) then
+                owner:ChatPrint(DISCONNECT_NOTIF)
             end
         end
     end
 end
 
-
-
 if SERVER then
     AddCSLuaFile("weapon_ttt_sopd.lua")
     util.AddNetworkString(SWORD_TARGET_MSG)
     util.AddNetworkString(SWORD_KILLED_MSG)
+    util.AddNetworkString(TARGET_DIED_MSG)
+    util.AddNetworkString(TARGET_SPAWNED_MSG)
+    util.AddNetworkString(GAINED_DISGUISE_MSG)
     --resource.AddWorkshop("3607870957")
     resource.AddFile("materials/vgui/ttt/icon_sopd.vmt")
     if DEBUG:GetBool() then print("[SoPD Server] Initializing....") end
@@ -215,6 +231,7 @@ if SERVER then
     -- Find the target player for this round!
     hook.Add("TTTBeginRound", HOOK_BEGIN_ROUND, function()
         local possibleTargetPool, playerCnt = GetPossibleTargetPool()
+        roundTargetPoolSize = #possibleTargetPool
 
         -- Select target player
         if #possibleTargetPool > 0 and playerCnt > 2 then
@@ -247,15 +264,23 @@ if SERVER then
         -- Broadcast chosen player
         net.Start(SWORD_TARGET_MSG)
         net.WritePlayer(swordTargetPlayer) --will send default (Entity(0)) if no target
+        net.WriteFloat(roundTargetPoolSize)
         net.Broadcast()
     end)
 
     hook.Add("PlayerDeath", HOOK_PLAYER_DEATH, function(ply, inflictor, attacker)
+        local targetDied = (swordTargetPlayer and ply == swordTargetPlayer)
+
+        if targetDied then
+            net.Start(TARGET_DIED_MSG)
+            net.Broadcast()
+        end
+
         -- Find any held swords & adjust or end (if target died) their deploy sounds
         for _, p in ipairs(player.GetAll()) do
             local wep = p:GetActiveWeapon()
             if IsValid(wep) and wep:GetClass() == CLASS_NAME then
-                if swordTargetPlayer and ply == swordTargetPlayer then
+                if targetDied then
                     if DEBUG:GetBool() then print("[SFX] Stopping sword deploy sound due to target death | Target: ", swordTargetPlayer:Nick()) end
                     StopDeploySound(wep)
 
@@ -274,11 +299,18 @@ if SERVER then
     end)
 
     hook.Add("PlayerSpawn", HOOK_PLAYER_SPAWN, function(ply)
+        local targetSpawned = (IsLivingPlayer(swordTargetPlayer) and ply == swordTargetPlayer)
+
+        if targetSpawned then
+            net.Start(TARGET_SPAWNED_MSG)
+            net.Broadcast()
+        end
+
         -- Find any held swords & adjust or start (if target respawned) their deploy sounds
         for _, p in ipairs(player.GetAll()) do
             local wep = p:GetActiveWeapon()
             if IsValid(wep) and wep:GetClass() == CLASS_NAME then
-                if IsLivingPlayer(swordTargetPlayer) and ply == swordTargetPlayer then
+                if targetSpawned then
                     if DEBUG:GetBool() then print("[SFX] Starting sword deploy sound due to target respawn | Target: ", swordTargetPlayer:Nick()) end
                     StartDeploySound(wep)
 
@@ -301,6 +333,7 @@ if SERVER then
 
             net.Start(SWORD_TARGET_MSG)
             net.WritePlayer(swordTargetPlayer)
+            net.WriteFloat(roundTargetPoolSize) --(player count at start of round didn't change)
             net.Broadcast()
         end
     end)
@@ -357,6 +390,7 @@ elseif CLIENT then
     shopSWEP = SWEP --ugly hack but not sure how else to do it
     net.Receive(SWORD_TARGET_MSG, function(msgLen, ply)
         local newTarget = net.ReadPlayer()
+        roundTargetPoolSize = net.ReadFloat()
 
         if newTarget == Entity(0) or not newTarget then
             if DEBUG:GetBool() then print("[SoPD Client] No sword target") end
@@ -403,7 +437,11 @@ elseif CLIENT then
 
         if CanBeSlain(tData:GetEntity()) and InTargetStabRange(localPlayer) and HoldsSword(localPlayer, true) then
             local role_color = localPlayer:GetRoleColor()
-            tData:AddDescriptionLine(LANG.TryTranslation("sopd_instantkill"), role_color)
+            local insta_label = "sopd_instantkill"
+            if localPlayer:GetActiveWeapon().Packed then
+                insta_label = "sopd_instanteat"
+            end
+            tData:AddDescriptionLine(LANG.TryTranslation(insta_label), role_color)
 
             -- draw instant-kill maker
             local x = ScrW() * 0.5
@@ -443,9 +481,43 @@ elseif CLIENT then
         end
     end)
 
+    function SWEP:UpdateTooltip(targetAlive)
+        if self.Packed then return end
+        if DEBUG:GetBool() then print("Updating sword tooltip...") end
+
+        if roundTargetPoolSize < 2 then
+            self:AddTTT2HUDHelp("sopd_instruction_targeted")
+        else
+            if swordTargetPlayer then
+                if targetAlive then
+                    self:AddTTT2HUDHelp("sopd_instruction_targeted")
+                else
+                    if RAGDOLL_STAB_COVERUP:GetBool() then
+                        self:AddTTT2HUDHelp("sopd_instruction_stab_coverup")
+                    else
+                        self:AddTTT2HUDHelp("sopd_instruction_stab")
+                    end
+                end
+            else
+                self:AddTTT2HUDHelp("sopd_instruction_targetless")
+            end
+        end
+    end
+
+    net.Receive(TARGET_DIED_MSG, function()
+        for _, sword in ipairs(GetAllInvSwords()) do
+            sword:UpdateTooltip(false)
+        end
+    end)
+
+    net.Receive(TARGET_SPAWNED_MSG, function()
+        for _, sword in ipairs(GetAllInvSwords()) do
+            sword:UpdateTooltip(true)
+        end
+    end)
+
     function SWEP:Initialize() --on buy (local to 1 player)
-        -- bottom tooltip
-        self:AddTTT2HUDHelp("sopd_instruction")
+        self:UpdateTooltip(IsLivingPlayer(swordTargetPlayer))
 
         -- chat notification if you buy sword after the target disconnects
         if GetOpponentCount() > 0 and not swordTargetPlayer
