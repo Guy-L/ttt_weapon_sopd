@@ -504,7 +504,7 @@ elseif CLIENT then
     end)
 
     function SWEP:UpdateTooltip(targetAlive)
-        if self.Packed then return end
+        if self.Packed or not roundTargetPoolSize then return end
         if DEBUG:GetBool() then print("Updating sword tooltip...") end
 
         if roundTargetPoolSize < 2 then
@@ -533,6 +533,8 @@ elseif CLIENT then
     end)
 
     net.Receive(TARGET_SPAWNED_MSG, function()
+        if not roundTargetPoolSize then return end --prevent timing issue on first round
+
         for _, sword in ipairs(GetAllInvSwords()) do
             sword:UpdateTooltip(true)
         end
@@ -544,8 +546,8 @@ elseif CLIENT then
         -- chat notification if you buy sword after the target disconnects
         local localPlayer = LocalPlayer()
 
-        if not swordTargetPlayer and roundTargetPoolSize > 1
-          and localPlayer:GetRole() != ROLE_DEATHMATCHER then
+        if not swordTargetPlayer and roundTargetPoolSize and
+          roundTargetPoolSize > 1 and localPlayer:GetRole() != ROLE_DEATHMATCHER then
             localPlayer:ChatPrint(DISCONNECT_NOTIF)
         end
 
