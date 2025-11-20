@@ -2,7 +2,7 @@ $modelname "Weapons/v_sopd.mdl"
 
 $bodygroup "studio"
 {
-	studio "v_sopd_reference.smd"
+    studio "v_sopd_reference.smd"
 }
 
 $surfaceprop "default"
@@ -50,75 +50,75 @@ $bonemerge "ValveBiped.Bip01_R_Hand"
 $bonemerge "ValveBiped.HandControlRotR"
 
 
-$sequence "idle01" {
-	"v_sopd_anims\sopd_idle01.smd"
-	activity "ACT_VM_IDLE" 1
-	fadein 0.2
-	fadeout 0.2
-	fps 30
-	loop
+$sequence "idle" {
+    "v_sopd_anims\sopd_idle01.smd"
+    activity "ACT_VM_IDLE" 1
+    fadein 0.2
+    fadeout 0.2
+    fps 30
+    loop
 }
 
 $sequence "draw" {
-	"v_sopd_anims\sopd_draw.smd"
-	activity "ACT_VM_DRAW" 1
-	fadein 0.2
-	fadeout 0.2
-	fps 30
+    "v_sopd_anims\sopd_draw.smd"
+    activity "ACT_VM_DRAW" 1
+    fadein 0.2
+    fadeout 0.2
+    fps 30
 }
 
 $sequence "misscenter1" {
-	"v_sopd_anims\sopd_misscenter1.smd"
-	activity "ACT_VM_MISSCENTER" 1
-	fadein 0.2
-	fadeout 0.2
-	fps 30
+    "v_sopd_anims\sopd_misscenter1.smd"
+    activity "ACT_VM_MISSCENTER" 1
+    fadein 0.2
+    fadeout 0.2
+    fps 30
 }
 
 $sequence "misscenter2" {
-	"v_sopd_anims\sopd_misscenter2.smd"
-	activity "ACT_VM_MISSCENTER" 1
-	fadein 0.2
-	fadeout 0.2
-	fps 30
+    "v_sopd_anims\sopd_misscenter2.smd"
+    activity "ACT_VM_MISSCENTER" 1
+    fadein 0.2
+    fadeout 0.2
+    fps 30
 }
 
 $sequence "hitcenter1" {
-	"v_sopd_anims\sopd_hitcenter1.smd"
-	activity "ACT_VM_HITCENTER" 1
-	fadein 0.2
-	fadeout 0.2
-	fps 30
+    "v_sopd_anims\sopd_hitcenter1.smd"
+    activity "ACT_VM_HITCENTER" 1
+    fadein 0.2
+    fadeout 0.2
+    fps 30
 }
 
 $sequence "hitcenter2" {
-	"v_sopd_anims\sopd_hitcenter2.smd"
-	activity "ACT_VM_HITCENTER" 1
-	fadein 0.2
-	fadeout 0.2
-	fps 30
+    "v_sopd_anims\sopd_hitcenter2.smd"
+    activity "ACT_VM_HITCENTER" 1
+    fadein 0.2
+    fadeout 0.2
+    fps 30
 }
 
 $sequence "hitcenter3" {
-	"v_sopd_anims\sopd_hitcenter3.smd"
-	activity "ACT_VM_HITCENTER" 1
-	fadein 0.2
-	fadeout 0.2
-	fps 30
+    "v_sopd_anims\sopd_hitcenter3.smd"
+    activity "ACT_VM_HITCENTER" 1
+    fadein 0.2
+    fadeout 0.2
+    fps 30
 }
 
 $sequence "hitkill1" {
-	"v_sopd_anims\sopd_hitkill1.smd"
-	activity "ACT_VM_HITKILL" 1
-	fadein 0.2
-	fadeout 0.2
-	fps 30
+    "v_sopd_anims\sopd_hitkill1.smd"
+    activity "ACT_VM_HITKILL" 1
+    fadein 0.2
+    fadeout 0.2
+    fps 30
 }
 
 $sequence "holster" {
-	"v_sopd_anims\sopd_holster.smd"
-	activity "ACT_VM_HOLSTER" 1
-	fadein 0.2
-	fadeout 0.2
-	fps 30
+    "v_sopd_anims\sopd_holster.smd"
+    activity "ACT_VM_HOLSTER" 1
+    fadein 0.2
+    fadeout 0.2
+    fps 30
 }

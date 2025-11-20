@@ -40,9 +40,9 @@ $sequence "attack1" {
 
 $collisionmodel "w_sopd_physics.smd"
 {
-	$mass 1
-	$inertia 1
-	$damping 0
-	$rotdamping 0
-	$rootbone " "
+	$mass 4
+	$inertia 3
+	$damping 1.5
+	$rotdamping 1
+	$rootbone "ValveBiped.Bip01_R_Hand"
 }

@@ -41,6 +41,7 @@ local OATMEAL_FOR_LAST = CreateConVar("ttt2_sopd_sfx_oatmeal_for_last", "1", CVA
 local DEBUG = CreateConVar("ttt2_sopd_debug", "0", CVAR_FLAGS, "Activates some debug client/server prints & makes Sword re-buyable (should not be on for real play).", 0, 1)
 
 sounds = {
+    swing         = Sound("Weapon_Crowbar.Single"),
     triumph_best  = Sound("sopd/sopd_triumph_best.mp3"),
     triumph_nobgm = Sound("sopd/sopd_triumph_nobgm.mp3"),
     triumph_other = Sound("sopd/sopd_triumph_other.mp3"),
@@ -316,6 +317,7 @@ elseif CLIENT then
     SWEP.ViewModelFlip = false
     SWEP.ViewModelFOV  = 80
     SWEP.DrawCrosshair = false
+    SWEP.UseHands      = true
 
     local dmgReductionDesc = ""
     local targetDmgBlock = TARGET_DMG_BLOCK:GetFloat()
@@ -455,10 +457,11 @@ elseif CLIENT then
     end
 end
 
-SWEP.Base       = "weapon_tttbase"
-SWEP.HoldType   = "melee"
-SWEP.ViewModel  = SWORD_VIEWMODEL
-SWEP.WorldModel = SWORD_WORLDMODEL
+SWEP.Base         = "weapon_tttbase"
+SWEP.HoldType     = "melee"
+SWEP.ViewModel    = SWORD_VIEWMODEL
+SWEP.WorldModel   = SWORD_WORLDMODEL
+SWEP.idleResetFix = true
 
 SWEP.Primary.Damage      = 100
 SWEP.Primary.ClipSize    = -1
@@ -477,6 +480,7 @@ SWEP.DeploySpeed = 2
 
 function SWEP:PrimaryAttack()
     self:SetNextPrimaryFire(CurTime() + self.Primary.Delay)
+    self:EmitSound(sounds["swing"])
 
     local owner = self:GetOwner()
     if not IsValid(owner) then return end
