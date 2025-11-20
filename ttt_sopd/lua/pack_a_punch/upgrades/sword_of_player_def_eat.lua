@@ -16,7 +16,7 @@ function UPGRADE:Apply(SWEP)
     end
 
     function SWEP:PackEffect(rag, owner)
-        local victim = rag.PlyOwner
+        self.packVictim = rag.PlyOwner
         owner:EmitSound(sounds["inhale"], SNDLVL_150dB, 100, AdjustVolume(KILL_SND_VOLUME:GetFloat()/100), CHAN_VOICE)
 
         -- delays to line up with suck sfx
@@ -31,10 +31,10 @@ function UPGRADE:Apply(SWEP)
             if not IsValid(owner) then return end
             owner:SetHealth(owner:Health() + PAP_HEAL:GetInt())
 
-            if IsValid(victim) and owner.ActivateDisguiserTarget then
-                owner:UpdateStoredDisguiserTarget(victim, victim:GetModel(), victim:GetSkin())
+            if IsValid(self.packVictim) and owner.ActivateDisguiserTarget then
+                owner:UpdateStoredDisguiserTarget(self.packVictim, self.packVictim:GetModel(), self.packVictim:GetSkin())
                 owner:ActivateDisguiserTarget()
-                self.CopiedIdentity = victim
+
                 net.Start(GAINED_DISGUISE_MSG)
                 net.Send(owner)
             end
@@ -44,8 +44,8 @@ function UPGRADE:Apply(SWEP)
     function SWEP:SecondaryAttack()
         local owner = self:GetOwner()
 
-        if IsValid(owner) and owner.ToggleDisguiserTarget and IsValid(self.CopiedIdentity) 
-          and owner.storedDisguiserTarget == self.CopiedIdentity then
+        if IsValid(owner) and owner.ToggleDisguiserTarget and IsValid(self.packVictim)
+          and owner.storedDisguiserTarget == self.packVictim then
             owner:ToggleDisguiserTarget()
         end
     end

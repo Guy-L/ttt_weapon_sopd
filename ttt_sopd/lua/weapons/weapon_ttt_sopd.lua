@@ -765,7 +765,7 @@ function SWEP:Consume(doPap, rag)
             self:SetClip1(0)
         end
 
-        if doPap and rag then
+        if doPap and rag and not self.packVictim then
             self:PackEffect(rag, self:GetOwner())
         end
     else
