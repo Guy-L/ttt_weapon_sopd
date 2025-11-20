@@ -606,7 +606,7 @@ function SWEP:PrimaryAttack()
         if self:CanStab() and tr.Hit and tr.HitNonWorld and IsValid(hitEnt) then
             if DEBUG:GetBool() then print("SoPD Primary Attack Check 2:", CanBeSlain(hitEnt), hitEnt:GetClass() == "prop_ragdoll", hitEnt:IsPlayerRagdoll(), CanBeSlain(hitEnt.PlyOwner), swordTargetPlayer or self.Packed, "from", swordTargetPlayer and 1 or 0, self.Packed) end
 
-            if CanBeSlain(hitEnt) then
+            if CanBeSlain(hitEnt) and owner:GetTeam() != TEAM_JESTER then
                 self:StabKill(tr, spos, sdest)
             elseif hitEnt:GetClass() == "prop_ragdoll" and hitEnt:IsPlayerRagdoll() and CanBeSlain(hitEnt.PlyOwner) and (swordTargetPlayer or self.Packed) then
                 self:StabRagdoll(tr, spos, sdest)
