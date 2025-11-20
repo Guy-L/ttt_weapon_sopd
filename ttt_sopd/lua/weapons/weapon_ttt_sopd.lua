@@ -520,9 +520,11 @@ elseif CLIENT then
         self:UpdateTooltip(IsLivingPlayer(swordTargetPlayer))
 
         -- chat notification if you buy sword after the target disconnects
-        if GetOpponentCount() > 0 and not swordTargetPlayer
-          and LocalPlayer():GetRole() != ROLE_DEATHMATCHER then
-            LocalPlayer():ChatPrint(DISCONNECT_NOTIF)
+        local localPlayer = LocalPlayer()
+
+        if not swordTargetPlayer and roundTargetPoolSize > 1
+          and localPlayer:GetRole() != ROLE_DEATHMATCHER then
+            localPlayer:ChatPrint(DISCONNECT_NOTIF)
         end
 
         return self.BaseClass.Initialize(self)
