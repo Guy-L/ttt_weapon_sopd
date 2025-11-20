@@ -35,7 +35,7 @@ function UPGRADE:Apply(SWEP)
                 owner:UpdateStoredDisguiserTarget(self.packVictim, self.packVictim:GetModel(), self.packVictim:GetSkin())
                 owner:ActivateDisguiserTarget()
 
-                net.Start(GAINED_DISGUISE_MSG)
+                net.Start("SoPD_GainedDisguiseMsg")
                 net.Send(owner)
             end
         end)
@@ -53,8 +53,9 @@ end
 
 if CLIENT then
     net.Receive("SoPD_GainedDisguiseMsg", function(msgLen, ply)
+
         for _, wep in ipairs(LocalPlayer():GetWeapons()) do
-            if wep:GetClass() == CLASS_NAME then
+            if wep:GetClass() == UPGRADE.class then
                 wep:AddTTT2HUDHelp("sopd_instruction_pap_lmb2", "sopd_instruction_pap_rmb")
             end
         end
