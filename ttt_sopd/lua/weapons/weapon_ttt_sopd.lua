@@ -438,9 +438,8 @@ elseif CLIENT then
             if swordTargetPlayer then
                 if IsLivingPlayer(swordTargetPlayer) then
                     glowTarget = {swordTargetPlayer}
-                else
+                elseif RAGDOLL_STAB_COVERUP:GetBool():
                     local targetRag = GetRagdollForPlayer(swordTargetPlayer) --slow & i hate
-                    --print(targetRag)
                     if IsValid(targetRag) then glowTarget = {targetRag} end
                 end
             elseif inRange then
