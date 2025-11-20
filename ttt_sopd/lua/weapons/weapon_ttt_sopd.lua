@@ -23,7 +23,7 @@ local DISCONNECT_NOTIF = "[SoPD] Target disconnected. Sword can now be used on a
 local CVAR_FLAGS = {FCVAR_NOTIFY, FCVAR_ARCHIVE}
 local ENABLE_TARGET_GLOW = CreateConVar("ttt2_sopd_target_glow", "1", CVAR_FLAGS, "Whether the target player glows for a player holding the Sword.", 0, 1)
 local LEAVE_DNA = CreateConVar("ttt2_sopd_leave_dna", "0", CVAR_FLAGS, "Whether stabbing with the Sword leaves DNA.", 0, 1)
-local RAGDOLL_STAB_COVERUP = CreateConVar("ttt2_sopd_ragdoll_stab_coverup", "1", CVAR_FLAGS, "Whether stabbing a dead target with the Sword makes it seem like the Sword killed them (removing DNA if relevant convar is enabled).", 0, 1)
+local RAGDOLL_STAB_COVERUP = CreateConVar("ttt2_sopd_ragdoll_stab_coverup", "1", CVAR_FLAGS, "Whether stabbing a dead target with the Sword makes it seem like the Sword killed them (removing DNA if relevant convar is disabled).", 0, 1)
 local CAN_TARGET_JESTERS = CreateConVar("ttt2_sopd_can_target_jesters", "1", CVAR_FLAGS, "Whether Jesters can be the target.", 0, 1)
 local RANGE_BUFF = CreateConVar("ttt2_sopd_range_buff", "1.5", CVAR_FLAGS, "Multiplier for the original TTT knife's range.", 0.01, 5)
 local TARGET_DMG_BLOCK = CreateConVar("ttt2_sopd_target_dmg_block", "100", CVAR_FLAGS, "Percent of damage the Sword holder blocks from the target (0 = take full damage, 100 = take no damage)", 0, 100)
@@ -79,7 +79,7 @@ function IsLivingPlayer(ply)
     return IsValid(ply) and ply:IsPlayer() and ply:Alive() and not ply:IsSpec()
 end
 
-function InTargetStabRange(ply)
+function InPlayerStabRange(ply)
     if not (IsValid(ply) and ply:IsPlayer()) then return false end
     local tr = ply:GetEyeTrace(MASK_SHOT)
     if not (tr.HitNonWorld and IsValid(tr.Entity)) then return false end
@@ -411,30 +411,53 @@ elseif CLIENT then
         end
     end)
 
+    -- why do I have to do this :(
+    function GetRagdollForPlayer(ply)
+        if not IsValid(ply) then return nil end
+
+        for _, ent in ipairs(ents.FindByClass("prop_ragdoll")) do
+            if not IsValid(ent) then continue end
+
+            if CORPSE.GetPlayerNick(ent, nil) == ply:Nick() then --this blows!!
+                return ent
+            end
+        end
+
+        return nil
+    end
+
     --display halo (through walls if convar is enabled & always if able to kill)
     hook.Add("PreDrawHalos", HOOK_PRE_GLOW, function()
         local localPlayer = LocalPlayer()
 
         if HoldsSword(localPlayer, true) then
-            local inRange = InTargetStabRange(localPlayer)
+            local inRange = InPlayerStabRange(localPlayer)
             local glowStrength = 1 + (inRange and 1 or 0) --increase strength for kill range
+            local glowTarget = {}
 
-            local target = {swordTargetPlayer}
-            if not swordTargetPlayer and inRange then
-                target = {ply:GetEyeTrace(MASK_SHOT).Entity}
+            if swordTargetPlayer then
+                if IsLivingPlayer(swordTargetPlayer) then
+                    glowTarget = {swordTargetPlayer}
+                else
+                    local targetRag = GetRagdollForPlayer(swordTargetPlayer) --slow & i hate
+                    --print(targetRag)
+                    if IsValid(targetRag) then glowTarget = {targetRag} end
+                end
+            elseif inRange then
+                glowTarget = {ply:GetEyeTrace(MASK_SHOT).Entity}
             end
 
-            if inRange or ENABLE_TARGET_GLOW:GetBool() and IsLivingPlayer(swordTargetPlayer) then
-                halo.Add(target, Color(254,215,0), glowStrength, glowStrength, glowStrength, true, true)
+            if inRange or ENABLE_TARGET_GLOW:GetBool() then
+                halo.Add(glowTarget, Color(254,215,0), glowStrength, glowStrength, glowStrength, true, true)
             end
         end
     end)
 
-    --notify instakill in target's info if InTargetStabRange
+    --notify instakill in target's info if InPlayerStabRange
     hook.Add("TTTRenderEntityInfo", HOOK_RENDER_ENTINFO, function(tData)
         local localPlayer = LocalPlayer()
 
-        if CanBeSlain(tData:GetEntity()) and InTargetStabRange(localPlayer) and HoldsSword(localPlayer, true) then
+        if CanBeSlain(tData:GetEntity()) and InPlayerStabRange(localPlayer) and HoldsSword(localPlayer, true) then
             local role_color = localPlayer:GetRoleColor()
             local insta_label = "sopd_instantkill"
             if localPlayer:GetActiveWeapon().Packed then
