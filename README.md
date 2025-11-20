@@ -2,17 +2,18 @@ See [the addon's workshop page](https://steamcommunity.com/sharedfiles/filedetai
 
 ### Known bugs & TODOs
 * Special behavior if player is holding their own defeat sword (can kill anyone with it?)
-* Cvar for "death's list" mode
+* Cvar for "death's list" mode (off by default)
 * Putting the target's profile pic. on the model or behind the shop icon (if possible)
 * Make deploy song loop instead of fading out
-* Cosmetic improvements to the PaP effect, making the upgrade message reflect the PAP damage resist convar & making it play the alternative deploy song
+* Cosmetic improvements to the PaP effect, making the upgrade message reflect the PAP damage resist. convar & making it play the alternative deploy song
+* Bug/Limitation: Target disconnecting mid-round will not change the weapon's name in the shop
 * Bug: Deploy song randomly stopping early
-* Bug: Deploy song not stopping in some cases when PaP'ing.
-* Bug: Randomly swapping models with the crowbar when deploying/holstering (note: may not happen on actual servers? TBD)
-* Bug: Odd stuff happens in testing when Swapper is last alive target (normally impossible, round ends)
+* Bug: Deploy song not stopping when it should in some cases when PaP'ing.
+* Bug: Randomly swapping models with the crowbar when deploying/holstering either item (note: may not happen on actual servers? TBD)
 * Bug: Two deploy songs may play at the same time when PaP'ing if target is last alive
-* Bug: Deploy song may restart after it ends when any player dies/respawns
-
+* Minor Bug: Odd stuff happens in local testing when Swapper is last alive target (normally impossible, round ends)
+* Minor Bug: Deploy song may restart after it ends when any player dies/respawns
+* Bug [wontfix]: PaP'ing sword after the target disconnects sends user the related chat notifcation agai
 
 
 
