@@ -1,6 +1,6 @@
 local UPGRADE = {}
 UPGRADE.id    = "sword_of_player_def_eat"
-UPGRADE.class = "weapon_ttt_sopd"
+UPGRADE.class = CLASS_NAME
 UPGRADE.desc  = "Inhale your enemy and make it later! (cannibalism + identity disguise on stab, even if the target is already dead)" -- no way to localize this?
 --Note: ID disguise functionality requires Identity Disguiser addon to work
 

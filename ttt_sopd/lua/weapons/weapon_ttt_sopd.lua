@@ -1,5 +1,5 @@
+CLASS_NAME = "weapon_ttt_sopd"
 local DEFAULT_NAME = "Sword of Player Defeat"
-local CLASS_NAME = "weapon_ttt_sopd"
 local SWORD_VIEWMODEL = "models/ttt/sopd/v_sopd.mdl"
 local SWORD_WORLDMODEL = "models/ttt/sopd/w_sopd.mdl"
 
@@ -20,6 +20,7 @@ local DISCONNECT_NOTIF = "[SoPD] Target disconnected. Sword can now be used on a
 local CVAR_FLAGS = {FCVAR_NOTIFY, FCVAR_ARCHIVE}
 local ENABLE_TARGET_GLOW = CreateConVar("ttt2_sopd_target_glow", "1", CVAR_FLAGS, "Whether the target player glows for a player holding the Sword.", 0, 1)
 local LEAVE_DNA = CreateConVar("ttt2_sopd_leave_dna", "0", CVAR_FLAGS, "Whether stabbing with the Sword leaves DNA.", 0, 1)
+local RAGDOLL_STAB_COVERUP = CreateConVar("ttt2_sopd_ragdoll_stab_coverup", "1", CVAR_FLAGS, "Whether stabbing a dead target with the Sword makes it seem like the Sword killed them (removing DNA if relevant convar is enabled).", 0, 1)
 local CAN_TARGET_JESTERS = CreateConVar("ttt2_sopd_can_target_jesters", "1", CVAR_FLAGS, "Whether Jesters can be the target.", 0, 1)
 local RANGE_BUFF = CreateConVar("ttt2_sopd_range_buff", "1.5", CVAR_FLAGS, "Multiplier for the original TTT knife's range.", 0.01, 5)
 local TARGET_DMG_BLOCK = CreateConVar("ttt2_sopd_target_dmg_block", "100", CVAR_FLAGS, "Percent of damage the Sword holder blocks from the target (0 = take full damage, 100 = take no damage)", 0, 100)
@@ -37,7 +38,6 @@ local STEALTH_VOL_REDUCTION = CreateConVar("ttt2_sopd_sfx_stealth_vol_reduction"
 local STEALTH_MAX_OPPS = CreateConVar("ttt2_sopd_sfx_stealth_max_opps", "10", CVAR_FLAGS, "The stealth volume reduction on Sword sound effects is fully applied when this many opponents (inno/side teams) or more are alive, then goes down linearly with the number of remaining opponents (to zero effect when only one opponent left).", 2, 24)
 local OATMEAL_FOR_LAST = CreateConVar("ttt2_sopd_sfx_oatmeal_for_last", "1", CVAR_FLAGS, "Whether \"1, 2, Oatmeal\" plays as the deploy song when the target is the last opponent alive.", 0, 1)
 
-local BEST_TRIUMPH_PROB = CreateConVar("ttt2_sopd_sfx_best_triumph_prob", "80", CVAR_FLAGS, "Chance sopd_triumph_best plays over the other two when target is stabbed.", 33, 100)
 local DEBUG = CreateConVar("ttt2_sopd_debug", "0", CVAR_FLAGS, "Activates some debug client/server prints & makes Sword re-buyable (should not be on for real play).", 0, 1)
 
 sounds = {
@@ -47,6 +47,8 @@ sounds = {
     oatmeal       = Sound("sopd/sopd_oatmeal.mp3"),
     gourmet       = Sound("sopd/sopd_gourmet.mp3"),
     inhale        = Sound("sopd/sopd_inhale.mp3"),
+    rag_stab1     = Sound("sopd/sopd_rag_stab1.mp3"),
+    rag_stab2     = Sound("sopd/sopd_rag_stab2.mp3"),
 }
 
 --sword target, synchronized for server & client
@@ -424,7 +426,7 @@ elseif CLIENT then
         if not isPapped and IsValid(swordEnt) then
             local choice
             local roll = math.random()
-            local best_sfx_prob = BEST_TRIUMPH_PROB:GetFloat() / 100
+            local best_sfx_prob = 0.8
 
             if roll <= best_sfx_prob then
                 choice = "triumph_best"
@@ -565,18 +567,18 @@ function SWEP:StabKill(tr, spos, sdest)
     local dmg = DamageInfo()
     dmg:SetDamage(12047)
     if LEAVE_DNA:GetBool() or target:GetTeam() == TEAM_JESTER then
-        dmg:SetAttacker(self:GetOwner())
+        dmg:SetAttacker(owner)
     end
     dmg:SetInflictor(self)
-    dmg:SetDamageForce(self:GetOwner():GetAimVector())
-    dmg:SetDamagePosition(self:GetOwner():GetPos())
+    dmg:SetDamageForce(owner:GetAimVector())
+    dmg:SetDamagePosition(owner:GetPos())
     dmg:SetDamageType(DMG_SLASH)
 
     -- raycast to get entity hit by sword (which should be a player's limb)
-    local retr = util.TraceLine({start=spos, endpos=sdest, filter=self:GetOwner(), mask=MASK_SHOT_HULL})
+    local retr = util.TraceLine({start=spos, endpos=sdest, filter=owner, mask=MASK_SHOT_HULL})
     if retr.Entity != target then
         local center = target:LocalToWorld(target:OBBCenter())
-        retr = util.TraceLine({start=spos, endpos=center, filter=self:GetOwner(), mask=MASK_SHOT_HULL})
+        retr = util.TraceLine({start=spos, endpos=center, filter=owner, mask=MASK_SHOT_HULL})
     end
 
     -- create knife effect creation fn
@@ -624,7 +626,7 @@ function SWEP:StabKill(tr, spos, sdest)
     end
 
     --dispatch killing attack, trigger sword sticking function & clean up
-    target:DispatchTraceAttack(dmg, spos + (self:GetOwner():GetAimVector() * 3), sdest)
+    target:DispatchTraceAttack(dmg, spos + (owner:GetAimVector() * 3), sdest)
     self:Consume(false)
 end
 
@@ -634,6 +636,7 @@ function SWEP:StabRagdoll(tr, spos, sdest)
     if not self.Packed then
         local ang = adjStuckSwordAngle(tr.Normal)
         local pos = adjStuckSwordPos(tr, ang)
+        local stabVol = 0.2
 
         local stuckSword = ents.Create("prop_physics")
         stuckSword:SetModel(SWORD_WORLDMODEL)
@@ -648,6 +651,26 @@ function SWEP:StabRagdoll(tr, spos, sdest)
 
         constraint.Weld(hitRagdoll, stuckSword, tr.PhysicsBone or 0, 0, 0, true)
         hitRagdoll:CallOnRemove("ttt_sword_cleanup", function() SafeRemoveEntity(stuckSword) end)
+
+        -- concealing death cause here if enabled
+        if RAGDOLL_STAB_COVERUP:GetBool() then
+            --gameplay relevant mechanic should have SOME risk
+            stabVol = math.max(stabVol, AdjustVolume(KILL_SND_VOLUME:GetFloat()/100))
+
+            hitRagdoll.was_headshot = false
+            hitRagdoll.dmgwep = CLASS_NAME
+            hitRagdoll.dmgtype = DMG_SLASH
+            hitRagdoll.scene.lastDamage = 12047
+            hitRagdoll.scene.hit_trace = util.TraceHull({start=Vector(1,1,1), endpos=Vector(1,1,1)}) --pointblank attack
+            hitRagdoll.scene.waterLevel  = 0
+            if not LEAVE_DNA:GetBool() then hitRagdoll.killer_sample = nil end
+        end
+
+        local stabSnd = "rag_stab1"
+        if math.random() > 0.8 then stabSnd = "rag_stab2" end
+
+        if DEBUG:GetBool() then print("[SFX] Playing ragdoll stab sound", stabSnd, "vol", stabVol) end
+        stuckSword:EmitSound(sounds[stabSnd], SNDLVL_70dB, 100, stabVol, CHAN_BODY)
     end
 
     self:Consume(true, hitRagdoll)
@@ -720,6 +743,10 @@ function SWEP:AddToSettingsMenu(parent)
     formMain:MakeCheckBox({
         serverConvar = "ttt2_sopd_leave_dna",
         label = "label_sopd_leave_dna"
+    })
+    formMain:MakeCheckBox({
+        serverConvar = "ttt2_sopd_ragdoll_stab_coverup",
+        label = "label_sopd_ragdoll_stab_coverup"
     })
     formMain:MakeCheckBox({
         serverConvar = "ttt2_sopd_target_glow",
@@ -825,16 +852,6 @@ function SWEP:AddToSettingsMenu(parent)
     formMisc:MakeCheckBox({
         serverConvar = "ttt2_sopd_debug",
         label = "label_sopd_debug"
-    })
-    formMisc:MakeHelp({
-        label = "label_sopd_best_triumph_prob_desc"
-    })
-    formMisc:MakeSlider({
-        serverConvar = "ttt2_sopd_sfx_best_triumph_prob",
-        label = "label_sopd_best_triumph_prob",
-        min = 33,
-        max = 100,
-        decimal = 0
     })
 end
 

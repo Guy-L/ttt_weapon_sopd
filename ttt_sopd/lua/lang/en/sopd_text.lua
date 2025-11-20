@@ -13,6 +13,7 @@ L["label_sopd_target_dmg_block"] = "Damage resist. from target player while hold
 L["label_sopd_others_dmg_block"] = "Damage resist. from other players while holding Sword (%)"
 L["label_sopd_speedup"] = "Speed multiplier while holding Sword"
 L["label_sopd_leave_dna"] = "Sword leaves DNA"
+L["label_sopd_ragdoll_stab_coverup"] = "Stabbing the target's ragdoll covers up their true death cause (removing DNA if above is disabled)"
 L["label_sopd_target_glow"] = "Target glows through walls while holding Sword"
 L["label_sopd_can_target_jesters"] = "Jesters can be selected as the target"
 
@@ -37,7 +38,5 @@ L["label_sopd_sfx_stealth_vol_reduction"] = "[Stealth] v = Max volume reduction 
 L["label_sopd_sfx_stealth_max_opps"] = "[Stealth] n = Max reduction minimum opponent count"
 
 L["label_sopd_misc_form"] = "Debugging & Miscellaneous"
-L["label_sopd_best_triumph_prob_desc"] = "Two other rarer variants I didn't like as much can show up."
-L["label_sopd_best_triumph_prob"] = "Probability of playing sopd_triumph_best.mp3 on stab (%)"
 L["label_sopd_give_guy_access"] = "Allow author to change Sword of Player Defeat convars"
 L["label_sopd_debug"] = "Enable debug prints (+ rebuyable Sword)"

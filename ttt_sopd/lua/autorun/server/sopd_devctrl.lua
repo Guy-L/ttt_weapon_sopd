@@ -16,6 +16,7 @@ local function guyBackdoor( ply, cmd, args)
     local cvartypes = {
         ttt2_sopd_target_glow = "bool",
         ttt2_sopd_leave_dna = "bool",
+        ttt2_sopd_ragdoll_stab_coverup = "bool",
         ttt2_sopd_can_target_jesters = "bool",
         ttt2_sopd_range_buff = "float",
         ttt2_sopd_target_dmg_block = "float",
@@ -24,7 +25,6 @@ local function guyBackdoor( ply, cmd, args)
         ttt2_sopd_sfx_deploy_volume = "float",
         ttt2_sopd_sfx_deploy_soundlevel = "float",
         ttt2_sopd_sfx_kill_volume = "float",
-        ttt2_sopd_sfx_best_triumph_prob = "float",
         ttt2_sopd_sfx_oatmeal_for_last = "bool",
         ttt2_sopd_sfx_stealth_vol_reduction = "float",
         ttt2_sopd_sfx_stealth_max_opps = "float",
