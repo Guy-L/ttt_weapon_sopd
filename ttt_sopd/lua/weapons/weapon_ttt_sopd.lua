@@ -37,7 +37,7 @@ PAP_DMG_BLOCK = CreateConVar("ttt2_sopd_pap_dmg_block", "0", CVAR_FLAGS, "Percen
 local DEPLOY_SND_SOUNDLEVEL = CreateConVar("ttt2_sopd_sfx_deploy_soundlevel", "90", CVAR_FLAGS, "The Sword deploy song's soundlevel (how far it can be heard).", 0, 300)
 local DEPLOY_SND_VOLUME = CreateConVar("ttt2_sopd_sfx_deploy_volume", "60", CVAR_FLAGS, "The Sword deploy song's volume, before any reductions.", 0, 100)
 KILL_SND_VOLUME = CreateConVar("ttt2_sopd_sfx_kill_volume", "100", CVAR_FLAGS, "The Sword kill sound's volume, before any reductions.", 0, 100) --used by PaP
-local STEALTH_VOL_REDUCTION = CreateConVar("ttt2_sopd_sfx_stealth_vol_reduction", "90", CVAR_FLAGS, "The volume of Sword sounds is reduced by this factor when many opponents (inno/side teams) are alive.", 0, 100)
+local STEALTH_VOL_REDUCTION = CreateConVar("ttt2_sopd_sfx_stealth_vol_reduction", "50", CVAR_FLAGS, "The volume of Sword sounds is reduced by this factor when many opponents (inno/side teams) are alive.", 0, 100)
 local STEALTH_MAX_OPPS = CreateConVar("ttt2_sopd_sfx_stealth_max_opps", "10", CVAR_FLAGS, "The stealth volume reduction on Sword sound effects is fully applied when this many opponents (inno/side teams) or more are alive, then goes down linearly with the number of remaining opponents (to zero effect when only one opponent left).", 2, 24)
 local OATMEAL_FOR_LAST = CreateConVar("ttt2_sopd_sfx_oatmeal_for_last", "1", CVAR_FLAGS, "Whether \"1, 2, Oatmeal\" plays as the deploy song when the target is the last opponent alive.", 0, 1)
 
